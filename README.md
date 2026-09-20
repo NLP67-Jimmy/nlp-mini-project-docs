@@ -5,7 +5,7 @@
 ---
 
 ## Live Website
-- URL สำหรับเข้าชมหน้าเว็บ: [https://verbaflow-solutions.github.io/nlp-mini-project-docs/]([https://verbaflow-solutions.github.io/nlp-mini-project-docs/](https://nlp67-jimmy.github.io/nlp-mini-project-docs/))
+- URL สำหรับเข้าชมหน้าเว็บ: [[https://verbaflow-solutions.github.io/nlp-mini-project-docs/]([https://verbaflow-solutions.github.io/nlp-mini-project-docs/](https://nlp67-jimmy.github.io/nlp-mini-project-docs/))](https://nlp67-jimmy.github.io/nlp-mini-project-docs/)
 
 ---
 
