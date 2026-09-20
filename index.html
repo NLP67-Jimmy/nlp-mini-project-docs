@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>แนวทาง & ข้อกำหนด Mini Project — NLP</title>
+
+<!-- Pre-render Theme Execution (Prevents Flash of Wrong Theme / FOUC) -->
+<script>
+  (function() {
+    try {
+      var saved = localStorage.getItem('nlp_doc_theme');
+      if (saved === 'light' || saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch(e) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ==========================================================================
+     COLOR SYSTEM & DESIGN TOKENS
+     Default Theme: Dark (:root)
+     Alternate Theme: Light ([data-theme="light"])
+     ========================================================================== */
+
+  :root {
+    /* Backgrounds */
+    --bg-primary: #0b0f17;
+    --bg-secondary: #111827;
+    --bg-subtle: #192231;
+    --bg-sidebar: #0e1522;
+    --bg-overlay: rgba(0, 0, 0, 0.75);
+
+    /* Text Colors */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-dim: #64748b;
+    --text-inverse: #0f172a;
+
+    /* Borders */
+    --border-color: #243042;
+    --border-strong: #334155;
+    --border-subtle: #1e293b;
+
+    /* Brand / Accent */
+    --accent-color: #3b82f6;
+    --accent-hover: #60a5fa;
+    --accent-soft: #172554;
+    --accent-border: #1e3a8a;
+    --accent-text: #93c5fd;
+
+    /* Semantic Status Badges & Callouts */
+    --success-bg: #064e3b;
+    --success-text: #6ee7b7;
+    --success-border: #065f46;
+
+    --warning-bg: #78350f;
+    --warning-text: #fde68a;
+    --warning-border: #92400e;
+
+    --danger-bg: #7f1d1d;
+    --danger-text: #fca5a5;
+    --danger-border: #991b1b;
+
+    --info-bg: #134e4a;
+    --info-text: #5eead4;
+    --info-border: #115e59;
+
+    --purple-bg: #581c87;
+    --purple-text: #d8b4fe;
+    --purple-border: #6b21a8;
+
+    /* Code & Elements */
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+    --code-border: #334155;
+
+    /* Scrollbar */
+    --scrollbar-thumb: #334155;
+    --scrollbar-track: transparent;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.5);
+
+    /* Typography & Sizing */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-full: 9999px;
+
+    --sidebar-w: 300px;
+    --header-h: 60px;
+    --content-max: 880px;
+    
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [data-theme="light"] {
+    /* Backgrounds */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-subtle: #f1f5f9;
+    --bg-sidebar: #ffffff;
+    --bg-overlay: rgba(15, 23, 42, 0.45);
+
+    /* Text Colors */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-dim: #94a3b8;
+    --text-inverse: #ffffff;
+
+    /* Borders */
+    --border-color: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --border-subtle: #f1f5f9;
+
+    /* Brand / Accent */
+    --accent-color: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: #eff6ff;
+    --accent-border: #bfdbfe;
+    --accent-text: #1d4ed8;
+
+    /* Semantic Status Badges & Callouts */
+    --success-bg: #ecfdf5;
+    --success-text: #047857;
+    --success-border: #a7f3d0;
+
+    --warning-bg: #fffbeb;
+    --warning-text: #b45309;
+    --warning-border: #fde68a;
+
+    --danger-bg: #fef2f2;
+    --danger-text: #b91c1c;
+    --danger-border: #fecaca;
+
+    --info-bg: #f0fdfa;
+    --info-text: #0f766e;
+    --info-border: #99f6e4;
+
+    --purple-bg: #faf5ff;
+    --purple-text: #7e22ce;
+    --purple-border: #e9d5ff;
+
+    /* Code & Elements */
+    --code-bg: #f1f5f9;
+    --code-text: #0f172a;
+    --code-border: #e2e8f0;
+
+    /* Scrollbar */
+    --scrollbar-thumb: #cbd5e1;
+    --scrollbar-track: transparent;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 6px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
+  }
+
+  /* ==========================================================================
+     GLOBAL RESET & SMOOTH THEME TRANSITION
+     ========================================================================== */
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Theme transition applied smoothly without flashing */
+  body, 
+  .sidebar, 
+  .mobile-header, 
+  .overview-hero, 
+  .project-card, 
+  .io-box,
+  .rubric-card, 
+  .ref-card, 
+  .prev-next-btn, 
+  .checklist-item, 
+  .rule-alert-box,
+  .info-badge-card, 
+  .table-container, 
+  table, 
+  thead th, 
+  tbody tr, 
+  tbody td,
+  .sidebar-search-input, 
+  .theme-toggle-btn, 
+  .mobile-menu-btn, 
+  .floating-btn,
+  .nav-link, 
+  .nav-badge-icon, 
+  .chip, 
+  .brand-badge,
+  .badge-deploy,
+  code {
+    transition: background-color 0.2s var(--ease), 
+                color 0.2s var(--ease), 
+                border-color 0.2s var(--ease), 
+                box-shadow 0.2s var(--ease);
+  }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'IBM Plex Sans Thai', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--accent-color);
+  }
+
+  a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s var(--ease);
+  }
+  a:hover {
+    color: var(--accent-hover);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.9em;
+    padding: 2px 6px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border: 1px solid var(--code-border);
+    border-radius: var(--radius-sm);
+  }
+
+  /* ==========================================================================
+     LAYOUT STRUCTURE
+     ========================================================================== */
+
+  .app-container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 40;
+  }
+
+  .sidebar-header {
+    padding: 24px 24px 18px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    background: var(--accent-soft);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-full);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin-bottom: 10px;
+  }
+
+  .brand-badge.purple {
+    background: var(--purple-bg);
+    color: var(--purple-text);
+    border-color: var(--purple-border);
+  }
+
+  .sidebar-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .sidebar-search-box {
+    padding: 14px 24px 8px;
+  }
+
+  .search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    width: 15px;
+    height: 15px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  .sidebar-search-input {
+    width: 100%;
+    padding: 7px 10px 7px 32px;
+    font-size: 13px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+  }
+
+  .sidebar-search-input::placeholder {
+    color: var(--text-dim);
+  }
+
+  .sidebar-search-input:focus {
+    border-color: var(--accent-color);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .sidebar-nav::-webkit-scrollbar {
+    width: 5px;
+  }
+  .sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
+
+  .nav-group {
+    margin-bottom: 20px;
+  }
+
+  .nav-group-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-dim);
+    padding: 0 10px;
+    margin-bottom: 6px;
+  }
+
+  .nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .nav-link.active {
+    background: var(--accent-soft);
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+
+  .nav-link.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3.5px;
+    background: var(--accent-color);
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* Micro Icon / Number Badges */
+  .nav-badge-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .nav-badge-icon svg {
+    width: 13px;
+    height: 13px;
+    stroke-width: 2;
+    color: inherit;
+  }
+
+  .nav-link.active .nav-badge-icon {
+    background: var(--accent-color);
+    color: var(--text-inverse);
+  }
+
+  .nav-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-sidebar);
+  }
+
+  .theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .theme-toggle-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+    background: var(--bg-secondary);
+  }
+
+  /* Main Content Area */
+  .main-wrapper {
+    flex: 1;
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-content {
+    max-width: var(--content-max);
+    width: 100%;
+    margin: 0 auto;
+    padding: 44px 32px 100px;
+  }
+
+  section {
+    scroll-margin-top: 36px;
+    margin-bottom: 44px;
+  }
+
+  .project-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 36px 36px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+  }
+
+  .project-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Hero Section */
+  .overview-hero {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 36px;
+    margin-bottom: 36px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .page-desc {
+    color: var(--text-secondary);
+    font-size: 15.5px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+  }
+
+  /* Course Info Banner */
+  .course-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .info-badge-card {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .info-badge-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+
+  .info-badge-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .criteria-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-lg);
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .criteria-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: var(--accent-color);
+    margin-top: 2px;
+  }
+
+  .criteria-callout strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* Rubric Cards */
+  .rubric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .rubric-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .rubric-card:hover {
+    border-color: var(--accent-border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .rubric-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .rubric-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rubric-score {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    background: var(--accent-soft);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-border);
+    white-space: nowrap;
+  }
+
+  .rubric-score.accent-purple {
+    background: var(--purple-bg);
+    color: var(--purple-text);
+    border-color: var(--purple-border);
+  }
+
+  .rubric-score.accent-green {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success-border);
+  }
+
+  .rubric-score.accent-amber {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border-color: var(--warning-border);
+  }
+
+  .rubric-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+
+  .rubric-list li {
+    position: relative;
+    padding-left: 14px;
+    line-height: 1.5;
+  }
+
+  .rubric-list li::before {
+    content: "•";
+    position: absolute;
+    left: 2px;
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  /* Alert / Rules Box */
+  .rule-alert-box {
+    display: flex;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 14px 0;
+  }
+
+  .rule-alert-box.danger {
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    color: var(--danger-text);
+  }
+
+  .rule-alert-box.info {
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    color: var(--info-text);
+  }
+
+  .rule-alert-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+  }
+
+  /* Checklist Styles */
+  .checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .checklist-item {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .checklist-icon {
+    color: var(--success-text);
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+  }
+
+  /* Table Styles */
+  .table-section {
+    margin-top: 32px;
+  }
+
+  .table-header-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+
+  .table-caption {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-secondary);
+    box-shadow: var(--shadow-xs);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    text-align: left;
+  }
+
+  thead th {
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 13px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: var(--bg-subtle);
+  }
+
+  tbody td {
+    padding: 16px 18px;
+    vertical-align: top;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  td.col-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 180px;
+  }
+
+  .col-name a {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .col-name a:hover {
+    color: var(--accent-color);
+  }
+
+  .cell-sub {
+    display: block;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-top: 3px;
+  }
+
+  .badge-deploy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 12.5px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .badge-deploy.high {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+  }
+
+  .badge-deploy.medium {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+  }
+
+  /* Project Details */
+  .project-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 24px;
+    margin-bottom: 28px;
+  }
+
+  .project-eng-badge {
+    display: inline-block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .project-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.35;
+    margin-bottom: 14px;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .chip.chip-difficulty {
+    background: var(--accent-soft);
+    color: var(--accent-color);
+    border-color: var(--accent-border);
+  }
+
+  /* Block Content */
+  .detail-block {
+    margin-bottom: 28px;
+  }
+
+  .detail-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .block-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+
+  .block-desc {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* IO Grid */
+  .io-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .io-box {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+  }
+
+  .io-box:hover {
+    border-color: var(--border-strong);
+  }
+
+  .io-box-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .io-box-tag {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+  }
+
+  .io-box.input .io-box-tag {
+    background: var(--info-bg);
+    color: var(--info-text);
+    border: 1px solid var(--info-border);
+  }
+
+  .io-box.output .io-box-tag {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+  }
+
+  .io-box-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .io-box p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Extension List */
+  .ext-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .ext-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-subtle);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .ext-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  .ext-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* References */
+  .ref-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .ref-card {
+    display: block;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+  }
+
+  .ref-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  .ref-card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .ref-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ref-card:hover .ref-title {
+    color: var(--accent-hover);
+  }
+
+  .ref-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .ref-desc {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .external-icon {
+    width: 13px;
+    height: 13px;
+    opacity: 0.6;
+    transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
+  }
+
+  .ref-card:hover .external-icon {
+    opacity: 1;
+    transform: translate(2px, -2px);
+  }
+
+  /* Prev / Next Navigation */
+  .prev-next-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .prev-next-btn {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 18px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+  }
+
+  .prev-next-btn:hover {
+    border-color: var(--accent-color);
+    background: var(--bg-secondary);
+    box-shadow: var(--shadow-xs);
+    text-decoration: none;
+  }
+
+  .prev-next-btn.next {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .prev-next-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .prev-next-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .prev-next-btn:hover .prev-next-title {
+    color: var(--accent-color);
+  }
+
+  /* Floating Quick Nav / Back to top */
+  .floating-actions {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 30;
+  }
+
+  .floating-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+  }
+
+  .floating-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .floating-btn:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  /* Mobile Bar */
+  .mobile-header {
+    display: none;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-h);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 20px;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 50;
+  }
+
+  .mobile-brand {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .mobile-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(2px);
+    z-index: 39;
+    opacity: 0;
+    transition: opacity 0.2s var(--ease);
+  }
+
+  /* Responsive Rules */
+  @media (max-width: 980px) {
+    :root {
+      --sidebar-w: 270px;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .mobile-header {
+      display: flex;
+    }
+
+    .sidebar {
+      transform: translateX(-100%);
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.2s var(--ease);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-backdrop.open {
+      display: block;
+      opacity: 1;
+    }
+
+    .main-wrapper {
+      margin-left: 0;
+    }
+
+    .main-content {
+      padding: 24px 16px 80px;
+    }
+
+    .overview-hero, .project-card {
+      padding: 24px 20px;
+      border-radius: var(--radius-lg);
+    }
+
+    .page-title {
+      font-size: 22px;
+    }
+
+    .project-title {
+      font-size: 20px;
+    }
+
+    .io-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .prev-next-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .prev-next-btn.next {
+      align-items: flex-start;
+      text-align: left;
+    }
+  }
+
+  /* Print Media Query */
+  @media print {
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #ffffff;
+      --text-primary: #000000;
+      --text-secondary: #333333;
+      --border-color: #cccccc;
+    }
+    .sidebar, .mobile-header, .floating-actions, .theme-toggle-btn {
+      display: none !important;
+    }
+    .main-wrapper {
+      margin-left: 0 !important;
+    }
+    .main-content {
+      padding: 0 !important;
+      max-width: 100% !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<header class="mobile-header">
+  <div class="mobile-brand">NLP · Mini Project</div>
+  <div class="mobile-header-actions">
+    <button class="theme-toggle-btn" id="mobileThemeToggle" aria-label="สลับธีม">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    </button>
+    <button class="mobile-menu-btn" id="menuToggle" aria-label="เปิดเมนูนำทาง">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
+</header>
+
+<div class="app-container">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar" aria-label="รายการโปรเจค">
+    <div class="sidebar-header">
+      <div class="brand-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        1323326 · NLP
+      </div>
+      <h2 class="sidebar-title">Mini Project Hub</h2>
+      <p class="sidebar-desc">ข้อกำหนด เกณฑ์คะแนน 40% และ 6 แนวทางหัวข้อโปรเจค</p>
+    </div>
+
+    <div class="sidebar-search-box">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="topicSearch" class="sidebar-search-input" placeholder="ค้นหาเกณฑ์ / หัวข้อ / เทคนิค...">
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <!-- Group 1: Requirements & Grading -->
+      <div class="nav-group">
+        <div class="nav-group-label">โจทย์ &amp; ข้อกำหนดวิชา</div>
+        <ul class="nav-list" id="guidelinesNavList">
+          <li>
+            <a class="nav-link" href="#rubric" data-target="rubric">
+              <span class="nav-badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 12h6"></path><path d="M9 16h6"></path></svg>
+              </span>
+              <span class="nav-text">เกณฑ์คะแนน (40%)</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#rules-submission" data-target="rules-submission">
+              <span class="nav-badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 11 17 15 13"></polyline></svg>
+              </span>
+              <span class="nav-text">กติกา &amp; สิ่งที่ต้องส่ง</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#team-roles" data-target="team-roles">
+              <span class="nav-badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </span>
+              <span class="nav-text">การจัดทีม 6–7 คน</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Group 2: Project Options -->
+      <div class="nav-group">
+        <div class="nav-group-label">ตัวเลือกหัวข้อ (6 โปรเจค)</div>
+        <ul class="nav-list" id="projectNavList">
+          <li>
+            <a class="nav-link" href="#overview" data-target="overview">
+              <span class="nav-badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              </span>
+              <span class="nav-text">เปรียบเทียบ 6 หัวข้อ</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#p1" data-target="p1">
+              <span class="nav-badge-icon">1</span>
+              <span class="nav-text">วิเคราะห์อารมณ์ข้อความ</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#p2" data-target="p2">
+              <span class="nav-badge-icon">2</span>
+              <span class="nav-text">ตรวจข่าวปลอม</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#p3" data-target="p3">
+              <span class="nav-badge-icon">3</span>
+              <span class="nav-text">สรุปข่าวอัตโนมัติ</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#p4" data-target="p4">
+              <span class="nav-badge-icon">4</span>
+              <span class="nav-text">ตรวจคำผิด/ไวยากรณ์</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#p5" data-target="p5">
+              <span class="nav-badge-icon">5</span>
+              <span class="nav-text">แชทบอทตอบคำถามเอกสาร</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="#p6" data-target="p6">
+              <span class="nav-badge-icon">6</span>
+              <span class="nav-text">ตัดคำ/NER เฉพาะโดเมน</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle-btn" id="themeToggle" aria-label="สลับธีมสี">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <span id="themeLabel">ธีมมืด</span>
+      </button>
+      <span class="footer-meta" style="font-size: 11.5px; color: var(--text-dim);">คะแนน 40%</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Body -->
+  <main class="main-wrapper">
+    <div class="main-content">
+
+      <!-- ============ SECTION: RUBRIC & CRITERIA ============ -->
+      <section id="rubric">
+        <div class="overview-hero">
+          <div class="brand-badge purple">
+            วิชา 1323326 การประมวลผลภาษาธรรมชาติ · อ. สถิดา สุขพงษ์
+          </div>
+          <h1 class="page-title">โจทย์ &amp; เกณฑ์การประเมิน Mini Project</h1>
+          <p class="page-desc">สรุปข้อกำหนดทางการจากเอกสารวิชา (คะแนนรวม 40%) เพื่อให้ทีมเข้าใจเป้าหมายที่แท้จริงและวางแผนทำโปรเจกต์ได้ตรงตาม Rubric ทุกข้อ</p>
+
+          <!-- Course Meta -->
+          <div class="course-info-grid">
+            <div class="info-badge-card">
+              <span class="info-badge-label">ขนาดกลุ่ม (Group Size)</span>
+              <span class="info-badge-val">6 – 7 คน / กลุ่ม</span>
+            </div>
+            <div class="info-badge-card">
+              <span class="info-badge-label">MS Teams Sec 1 / Sec 2</span>
+              <span class="info-badge-val"><code>pdm1hti</code> / <code>k3hlsii</code></span>
+            </div>
+            <div class="info-badge-card">
+              <span class="info-badge-label">Drop ไม่ติด W / ติด W</span>
+              <span class="info-badge-val">11 ก.ย. / 30 ต.ค. 2026</span>
+            </div>
+            <div class="info-badge-card">
+              <span class="info-badge-label">ช่วง Final Exam</span>
+              <span class="info-badge-val">18 – 22 พฤศจิกายน 2026</span>
+            </div>
+          </div>
+
+          <!-- Rubric Breakdown -->
+          <h3 class="block-title" style="margin-top: 24px; font-size: 17px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            สัดส่วนคะแนน 5 ส่วนหลัก (Total 40%)
+          </h3>
+
+          <div class="rubric-grid">
+            <!-- 1. Idea -->
+            <div class="rubric-card">
+              <div class="rubric-header">
+                <span class="rubric-title">1. Idea + Pain-point + Ref</span>
+                <span class="rubric-score">10%</span>
+              </div>
+              <ul class="rubric-list">
+                <li><strong>Pain point:</strong> ปัญหาคืออะไร</li>
+                <li><strong>User:</strong> กลุ่มเป้าหมายคือใคร</li>
+                <li><strong>Idea / Solution:</strong> ทำอะไร (What), ทำทำไม (Why), ทำไมต้องใช้ NLP, ดีกว่าเดิมอย่างไร</li>
+                <li><strong>Methodology:</strong> วิธีการทำ Data, Model, ขอบเขต (Limitation)</li>
+                <li><strong>Reference:</strong> แหล่งอ้างอิงงานวิจัย / Repo</li>
+              </ul>
+            </div>
+
+            <!-- 2. Product -->
+            <div class="rubric-card">
+              <div class="rubric-header">
+                <span class="rubric-title">2. Product &amp; Results</span>
+                <span class="rubric-score accent-green">10%</span>
+              </div>
+              <ul class="rubric-list">
+                <li><strong>Real Product (5%):</strong> Deploy ขึ้นใช้งานได้จริง (Website / Webapp / Bot) มี Link ใช้งานได้จริง</li>
+                <li><strong>Results (5%):</strong> มี Train-Test data, มี Metrics ประเมินผล, <strong>ต้องมีโมเดลเทียบกับ Baseline</strong>, ทำ Error analysis</li>
+              </ul>
+            </div>
+
+            <!-- 3. Code -->
+            <div class="rubric-card">
+              <div class="rubric-header">
+                <span class="rubric-title">3. Code &amp; GitHub</span>
+                <span class="rubric-score">5%</span>
+              </div>
+              <ul class="rubric-list">
+                <li><strong>GitHub Repo:</strong> ลิงก์โค้ดชัดเจน ทุกคนในทีมต้องมี Commit</li>
+                <li><strong>README.md:</strong> อธิบาย Idea, How to use / run / customize, ข้อมูล Data + Results, และรายชื่อสมาชิก + บทบาท</li>
+              </ul>
+            </div>
+
+            <!-- 4. Presentation & QA -->
+            <div class="rubric-card">
+              <div class="rubric-header">
+                <span class="rubric-title">4. Presentation + Q&amp;A</span>
+                <span class="rubric-score accent-purple">10%</span>
+              </div>
+              <ul class="rubric-list">
+                <li><strong>Presentation (5%):</strong> วิดีโอสาธิตผลิตภัณฑ์ (Demo video) + นำเสนอหน้าห้อง (Pitching &amp; Live demo)</li>
+                <li><strong>Q&amp;A (5%):</strong> ถามกลุ่มอื่นได้ (+1 คะแนน/คำถาม เดี่ยว), ตอบคำถามกลุ่มตนเองได้ (+1 คะแนน กลุ่ม)</li>
+              </ul>
+            </div>
+
+            <!-- 5. Teamwork -->
+            <div class="rubric-card">
+              <div class="rubric-header">
+                <span class="rubric-title">5. Teamwork (รายบุคคล)</span>
+                <span class="rubric-score accent-amber">5%</span>
+              </div>
+              <ul class="rubric-list">
+                <li><strong>Git commit count (2%):</strong> ตรวจประวัติการทำงานจริงจาก Git commit</li>
+                <li><strong>MS Form (3%):</strong> แบบฟอร์มประเมินการทำงานร่วมกันและการมีส่วนร่วมในทีม</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION: RULES & SUBMISSION ============ -->
+      <section id="rules-submission">
+        <div class="project-card">
+          <div class="project-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;">
+            <span class="project-eng-badge" style="color: var(--danger-text);">Rules &amp; Critical Conditions</span>
+            <h2 class="project-title" style="margin-bottom: 0;">กติกาสำคัญ &amp; เช็กลิสต์สิ่งที่ต้องส่ง</h2>
+          </div>
+
+          <!-- Rules Alert -->
+          <div class="rule-alert-box danger">
+            <svg class="rule-alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <div>
+              <strong>กติกาเรื่อง Bug ใน Product:</strong>
+              <div style="margin-top: 4px;">
+                • หาก Product ของกลุ่มพบ Bug: <span style="font-weight:700;">หัก -0.5 คะแนน / error</span><br>
+                • หากทดสอบและ <span style="font-weight:700;">พบ Bug ของกลุ่มอื่น: ได้คะแนนพิเศษ +0.5 คะแนน / error</span><br>
+                • <em>กรณีไม่มี Product (No Product):</em> ได้สูงสุดเพียง 2% และต้องอธิบายเหตุผลชัดเจนว่าทำไมถึงไม่สำเร็จ (Why it failed) พร้อมแสดง Mock product (Expected results)
+              </div>
+            </div>
+          </div>
+
+          <div class="rule-alert-box info">
+            <svg class="rule-alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <div>
+              <strong>กลยุทธ์การเก็บคะแนน Q&amp;A (5%):</strong> แต่ละกลุ่มถามได้สูงสุด 5 คำถาม โดยการตั้งคำถามถามกลุ่มอื่นจะเพิ่มคะแนนเดี่ยว (+1 ต่อข้อ) และการตอบคำถามของกลุ่มตนเองได้ถูกต้องจะเพิ่มคะแนนกลุ่ม (+1)
+            </div>
+          </div>
+
+          <!-- Submission Checklist -->
+          <h3 class="block-title" style="margin-top: 24px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            เช็กลิสต์ชิ้นงานที่ต้องส่งให้อาจารย์ (Submission Deliverables)
+          </h3>
+
+          <div class="checklist-grid">
+            <div class="checklist-item">
+              <svg class="checklist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <div>
+                <strong>1. Github Repo Link</strong>
+                <div style="font-size: 12.5px; color: var(--text-dim);">พร้อมไฟล์ README.md อธิบายวิธีการรันอย่างครบถ้วน</div>
+              </div>
+            </div>
+
+            <div class="checklist-item">
+              <svg class="checklist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <div>
+                <strong>2. Product Link</strong>
+                <div style="font-size: 12.5px; color: var(--text-dim);">ลิงก์เว็บแอป / บอท ที่ deploy ใช้งานได้จริง (Live Web/Bot)</div>
+              </div>
+            </div>
+
+            <div class="checklist-item">
+              <svg class="checklist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <div>
+                <strong>3. Slide Presentation</strong>
+                <div style="font-size: 12.5px; color: var(--text-dim);">สไลด์ Pain point, Solution, Architecture &amp; Results</div>
+              </div>
+            </div>
+
+            <div class="checklist-item">
+              <svg class="checklist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <div>
+                <strong>4. Video Demonstration</strong>
+                <div style="font-size: 12.5px; color: var(--text-dim);">วิดีโอนำเสนอสาธิตการใช้งานผลิตภัณฑ์</div>
+              </div>
+            </div>
+
+            <div class="checklist-item">
+              <svg class="checklist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <div>
+                <strong>5. MS Form (Teamwork)</strong>
+                <div style="font-size: 12.5px; color: var(--text-dim);">ส่งแบบฟอร์มประเมินบทบาทและการทำงานในทีม</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION: TEAM ROLES GUIDE ============ -->
+      <section id="team-roles">
+        <div class="project-card">
+          <div class="project-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 16px;">
+            <span class="project-eng-badge">Team Allocation Guide</span>
+            <h2 class="project-title" style="margin-bottom: 0;">แนวทางการแบ่งบทบาททีม 6 – 7 คน</h2>
+          </div>
+          <p class="block-desc" style="margin-bottom: 18px;">เพื่อให้ทุกคนมี Git commit และบทบาทที่ชัดเจนใน README.md ตามเกณฑ์คะแนน Teamwork (5%) แนะนำให้จัดสรรหน้าที่ดังนี้:</p>
+
+          <div class="ext-list">
+            <div class="ext-item">
+              <span class="ext-bullet"></span>
+              <div>
+                <strong>1–2. Data Engineer &amp; Baseline Analyst:</strong> รวบรวม Dataset, ทำ Data Preprocessing/Cleaning, สร้างและรันโมเดล Baseline เพื่อเก็บตัวเลขเปรียบเทียบ
+              </div>
+            </div>
+            <div class="ext-item">
+              <span class="ext-bullet" style="background: var(--purple-text);"></span>
+              <div>
+                <strong>3–4. NLP &amp; Model Specialist:</strong> Fine-tune โมเดลหลัก (Transformer/LLM), คำนวณ Metrics (Accuracy/F1/ROUGE), ทำ Error Analysis
+              </div>
+            </div>
+            <div class="ext-item">
+              <span class="ext-bullet" style="background: var(--success-text);"></span>
+              <div>
+                <strong>5–6. Full-Stack / Deployment Engineer:</strong> พัฒนา UI/UX (Streamlit / Gradio / Web App / LINE Bot), เชื่อมต่อ API และ Deploy ขึ้น Cloud เพื่อไม่ให้เกิด Bug
+              </div>
+            </div>
+            <div class="ext-item">
+              <span class="ext-bullet" style="background: var(--warning-text);"></span>
+              <div>
+                <strong>7. Product Lead, Pitching &amp; QA:</strong> จัดทำสไลด์ Pitching, อัดคลิป Video Demo, ดูแล README.md และทดสอบหา Bug ภายในรวมถึงเตรียมคำถาม Q&amp;A
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ OVERVIEW COMPARISON ============ -->
+      <section id="overview">
+        <div class="overview-hero">
+          <h2 class="page-title">เปรียบเทียบ 6 ตัวเลือกหัวข้อ</h2>
+          <p class="page-desc">6 แนวทางสำหรับ mini project วิชา Natural Language Processing แต่ละแนวทางมีบรรทัดฐาน (dataset, baseline, หรืองานที่ deploy จริง) รองรับอยู่แล้ว จึงเปรียบเทียบผลงานของทีมกับของจริงได้ และมีตัวอย่างที่คนอื่นทำสำเร็จมาก่อนให้อ้างอิง</p>
+
+          <div class="criteria-callout">
+            <svg class="criteria-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <div>
+              <strong>เกณฑ์ที่ใช้คัดตัวเลือกเหล่านี้:</strong> มี dataset หรือ baseline สาธารณะให้เทียบผลได้ทันที, มีงานวิจัยหรือ repo ที่ทำสำเร็จมาก่อนจริงให้อ้างอิง, และ deploy เป็นโปรดักต์ใช้งานได้จริงภายในเวลาของโปรเจคระยะสั้น
+            </div>
+          </div>
+
+          <div class="table-section">
+            <div class="table-header-group">
+              <span class="table-caption">คลิกชื่อโปรเจคเพื่อดูรายละเอียดเต็ม</span>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>โปรเจค</th>
+                    <th>ปัญหาหลักที่แก้</th>
+                    <th>เทคนิคหลักที่ใช้</th>
+                    <th>ความพร้อม deploy</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-name">
+                      <a href="#p1">วิเคราะห์อารมณ์ข้อความ<span class="cell-sub">Sentiment / Text Classification</span></a>
+                    </td>
+                    <td>ไล่อ่านคอมเมนต์ลูกค้าจำนวนมากไม่ทัน</td>
+                    <td>Fine-tune WangchanBERTa</td>
+                    <td><span class="badge-deploy high">สูง — มี baseline พร้อม</span></td>
+                  </tr>
+                  <tr>
+                    <td class="col-name">
+                      <a href="#p2">ตรวจข่าวปลอม<span class="cell-sub">Fake News Detection</span></a>
+                    </td>
+                    <td>ข้อมูลผิดแพร่เร็วในโซเชียล</td>
+                    <td>IR + feature extraction + classifier</td>
+                    <td><span class="badge-deploy medium">กลาง — ต้องเก็บข้อมูลเอง</span></td>
+                  </tr>
+                  <tr>
+                    <td class="col-name">
+                      <a href="#p3">สรุปข่าวอัตโนมัติ<span class="cell-sub">News Summarization</span></a>
+                    </td>
+                    <td>ข่าวยาว อ่านไม่ทัน</td>
+                    <td>TextRank + mBART (extractive + abstractive)</td>
+                    <td><span class="badge-deploy high">สูง — มี dataset ขนาดใหญ่พร้อม</span></td>
+                  </tr>
+                  <tr>
+                    <td class="col-name">
+                      <a href="#p4">ตรวจคำผิด/ไวยากรณ์<span class="cell-sub">Spelling &amp; Grammar Correction</span></a>
+                    </td>
+                    <td>พิมพ์ผิด/สะกดผิดในแชทและเอกสาร</td>
+                    <td>CRF baseline → neural correction</td>
+                    <td><span class="badge-deploy high">สูง — มี package ใช้งานจริงแล้ว</span></td>
+                  </tr>
+                  <tr>
+                    <td class="col-name">
+                      <a href="#p5">แชทบอทตอบคำถามเอกสาร<span class="cell-sub">RAG Chatbot / Document QA</span></a>
+                    </td>
+                    <td>ค้นข้อมูลในเอกสารยาวเสียเวลา</td>
+                    <td>Retrieval-Augmented Generation + Thai LLM</td>
+                    <td><span class="badge-deploy high">สูง — deploy ง่าย ตรงเทรนด์</span></td>
+                  </tr>
+                  <tr>
+                    <td class="col-name">
+                      <a href="#p6">ตัดคำ/NER เฉพาะโดเมน<span class="cell-sub">Domain-specific Segmentation</span></a>
+                    </td>
+                    <td>โมเดลตัดคำทั่วไปพลาดคำศัพท์เฉพาะทาง</td>
+                    <td>ปรับ DeepCut/SynThai ให้เข้าโดเมน</td>
+                    <td><span class="badge-deploy medium">กลาง — เชิงเทคนิคมากกว่าโปรดักต์</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROJECT 1 ============ -->
+      <section id="p1">
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-eng-badge">Sentiment / Text Classification</span>
+            <h2 class="project-title">1. วิเคราะห์อารมณ์ข้อความภาษาไทย</h2>
+            <div class="chip-row">
+              <span class="chip">การจำแนกข้อความ</span>
+              <span class="chip chip-difficulty">ความยาก: ต่ำ–ปานกลาง</span>
+              <span class="chip">สัปดาห์ 4–5 (embeddings / language model)</span>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">คืออะไร</h3>
+            <p class="block-desc">ระบบจำแนกอารมณ์หรือหมวดหมู่ของข้อความภาษาไทยจากโซเชียลมีเดีย โดย fine-tune โมเดลภาษา WangchanBERTa บนชุดข้อมูล Wisesight Sentiment Corpus แล้ววัดผลเทียบกับ baseline ที่ทีม PyThaiNLP เผยแพร่ไว้แล้ว (fastText, Linear SVM, ULMFit) ทำให้ทีมมีตัวเลขที่ต้องเอาชนะอยู่แล้วตั้งแต่วันแรก</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">อินพุตและเอาต์พุต</h3>
+            <div class="io-grid">
+              <div class="io-box input">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Input</span>
+                  <span class="io-box-title">อินพุต</span>
+                </div>
+                <p>ข้อความภาษาไทย (โพสต์ คอมเมนต์ รีวิว) เป็นข้อความเดี่ยวหรือไฟล์ CSV จำนวนมาก</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Output</span>
+                  <span class="io-box-title">เอาต์พุต</span>
+                </div>
+                <p>ป้ายอารมณ์ (positive / neutral / negative / question) พร้อมค่าความมั่นใจของแต่ละข้อความ</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ปัญหาที่แก้ไข</h3>
+            <p class="block-desc">แบรนด์และธุรกิจได้รับคอมเมนต์จำนวนมากทุกวันแต่ไม่มีเวลาไล่อ่านทั้งหมดเพื่อประเมินความพอใจของลูกค้า ทำให้พลาดสัญญาณเชิงลบที่ควรรีบแก้ไข</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ต่อยอดไปสู่ระบบอะไรได้บ้าง</h3>
+            <ul class="ext-list">
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Social Listening Dashboard</strong> — แดชบอร์ดติดตามความรู้สึกลูกค้าต่อแบรนด์แบบเรียลไทม์</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ระบบแจ้งเตือนวิกฤต</strong> — ส่งแจ้งเตือนอัตโนมัติเมื่อพบข้อความเชิงลบจำนวนมากในเวลาสั้น</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Customer Feedback Monitoring</strong> — เชื่อมกับ LINE OA หรือ Facebook Page ขององค์กรเพื่อคัดกรองข้อความที่ต้องตอบกลับก่อน</div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">เอกสารอ้างอิงและตัวอย่างที่มีอยู่แล้ว</h3>
+            <div class="ref-list">
+              <a class="ref-card" href="https://github.com/PyThaiNLP/classification-benchmarks" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">PyThaiNLP — Thai Text Classification Benchmarks <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/PyThaiNLP</span>
+                </div>
+                <p class="ref-desc">Baseline พร้อมใช้บน 4 dataset ด้วย fastText, linear model และ ULMFit — ใช้เป็นเส้นเทียบผลได้ทันที</p>
+              </a>
+              <a class="ref-card" href="https://github.com/PyThaiNLP/wisesight-sentiment" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">Wisesight Sentiment Corpus <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/PyThaiNLP</span>
+                </div>
+                <p class="ref-desc">ชุดข้อมูลข้อความโซเชียลไทย 26,737 ข้อความ พร้อมป้ายอารมณ์ 4 คลาส</p>
+              </a>
+              <a class="ref-card" href="https://github.com/vistec-AI/thai2transformers" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">WangchanBERTa (thai2transformers) <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/vistec-AI</span>
+                </div>
+                <p class="ref-desc">โมเดลภาษาไทยจาก VISTEC-depa ที่ finetune บน Wisesight ไว้แล้ว ใช้เป็นจุดเริ่มต้นในการปรับต่อ</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="prev-next-nav">
+            <a class="prev-next-btn prev" href="#rubric">
+              <span class="prev-next-label">กลับไปที่</span>
+              <span class="prev-next-title">← เกณฑ์คะแนน (40%)</span>
+            </a>
+            <a class="prev-next-btn next" href="#p2">
+              <span class="prev-next-label">ต่อไป</span>
+              <span class="prev-next-title">ตรวจข่าวปลอม →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROJECT 2 ============ -->
+      <section id="p2">
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-eng-badge">Fake News Detection</span>
+            <h2 class="project-title">2. ตรวจสอบข่าวปลอมภาษาไทย</h2>
+            <div class="chip-row">
+              <span class="chip">การจำแนกข้อความ + IR</span>
+              <span class="chip chip-difficulty">ความยาก: ปานกลาง</span>
+              <span class="chip">มีงานวิจัยรองรับหนาแน่น</span>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">คืออะไร</h3>
+            <p class="block-desc">ระบบให้คะแนนความน่าเชื่อถือของข่าวหรือข้อความภาษาไทย โดยอ้างอิงแนวทางจากงานวิจัยที่ตีพิมพ์แล้ว ซึ่งผสาน information retrieval (ดึงข่าวจากเว็บ) เข้ากับ NLP สำหรับสกัด feature และ machine learning classifier สำหรับตัดสินผล</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">อินพุตและเอาต์พุต</h3>
+            <div class="io-grid">
+              <div class="io-box input">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Input</span>
+                  <span class="io-box-title">อินพุต</span>
+                </div>
+                <p>ลิงก์ข่าว หรือข้อความ/พาดหัวข่าวที่ต้องการตรวจสอบ</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Output</span>
+                  <span class="io-box-title">เอาต์พุต</span>
+                </div>
+                <p>คะแนนความน่าเชื่อถือ พร้อมเหตุผลประกอบ เช่น การใช้ภาษาเร้าอารมณ์ หรือความสอดคล้องกับข่าวจากแหล่งอื่น</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ปัญหาที่แก้ไข</h3>
+            <p class="block-desc">ข้อมูลผิดและข่าวปลอมแพร่กระจายเร็วกว่าการตรวจสอบด้วยคน โดยเฉพาะช่วงวิกฤตหรือข่าวการเมือง ผู้ใช้ทั่วไปไม่มีเครื่องมือตรวจสอบเบื้องต้นก่อนแชร์ต่อ</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ต่อยอดไปสู่ระบบอะไรได้บ้าง</h3>
+            <ul class="ext-list">
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Browser Extension</strong> — ตรวจข่าวปลอมแบบเรียลไทม์ขณะเลื่อนดูฟีดข่าว</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>LINE / Messenger Bot</strong> — ตรวจสอบลิงก์ก่อนแชร์ในกลุ่มแชท</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ระบบ Fact-checking ภายในองค์กรสื่อ</strong> — คัดกรองข่าวก่อนเผยแพร่หรือเผยแพร่ซ้ำ</div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">เอกสารอ้างอิงและตัวอย่างที่มีอยู่แล้ว</h3>
+            <div class="ref-list">
+              <a class="ref-card" href="https://link.springer.com/article/10.1007/s42979-021-00775-6" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">Thai Fake News Detection Based on IR, NLP and ML <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">SN Computer Science, 2021</span>
+                </div>
+                <p class="ref-desc">งานวิจัยเสนอ framework 3 ส่วน (IR / NLP / ML) เก็บข้อมูลจากเว็บข่าวไทยจริง</p>
+              </a>
+              <a class="ref-card" href="https://ph02.tci-thaijo.org/index.php/ECTI-EEC/article/view/255364" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">Ensemble ML for Identifying Fake News Headlines in Thailand <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">ECTI Transactions (TCI), 2024</span>
+                </div>
+                <p class="ref-desc">เปรียบเทียบโมเดล ensemble หลายแบบสำหรับตรวจพาดหัวข่าวปลอมไทยโดยเฉพาะ</p>
+              </a>
+              <a class="ref-card" href="https://beei.org/index.php/EEI/article/download/2745/2154" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">The COVID-19 Fake News Detection in Thai Social Texts <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">Bulletin of EEI</span>
+                </div>
+                <p class="ref-desc">ใช้ transfer learning (BERT, ULMFiT, GPT) ร่วมกับการแปลข้อมูลจากอังกฤษเป็นไทยเพื่อขยาย dataset</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="prev-next-nav">
+            <a class="prev-next-btn prev" href="#p1">
+              <span class="prev-next-label">ก่อนหน้า</span>
+              <span class="prev-next-title">← วิเคราะห์อารมณ์ข้อความ</span>
+            </a>
+            <a class="prev-next-btn next" href="#p3">
+              <span class="prev-next-label">ต่อไป</span>
+              <span class="prev-next-title">สรุปข่าวอัตโนมัติ →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROJECT 3 ============ -->
+      <section id="p3">
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-eng-badge">News Summarization</span>
+            <h2 class="project-title">3. สรุปข่าวไทยอัตโนมัติ</h2>
+            <div class="chip-row">
+              <span class="chip">Extractive + Abstractive</span>
+              <span class="chip chip-difficulty">ความยาก: ปานกลาง</span>
+              <span class="chip">สัปดาห์ 6 (encoder–decoder / attention)</span>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">คืออะไร</h3>
+            <p class="block-desc">ระบบสรุปข่าวภาษาไทยแบบสองขั้นตอน ใช้ TextRank คัดประโยคสำคัญออกมาก่อน แล้วส่งให้ mBART ที่ finetune แล้วสร้างข้อสรุปแบบ abstractive ประเมินผลด้วย ROUGE และ BERTScore เทียบกับ baseline อย่าง Lead-3</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">อินพุตและเอาต์พุต</h3>
+            <div class="io-grid">
+              <div class="io-box input">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Input</span>
+                  <span class="io-box-title">อินพุต</span>
+                </div>
+                <p>URL ข่าว หรือเนื้อข่าวฉบับเต็มที่วางเข้าไปตรง ๆ</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Output</span>
+                  <span class="io-box-title">เอาต์พุต</span>
+                </div>
+                <p>ข้อความสั้น 2–4 บรรทัดที่คงประเด็นหลักไว้ พร้อมคะแนนเทียบ baseline</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ปัญหาที่แก้ไข</h3>
+            <p class="block-desc">ข่าวออนไลน์ยาวและมีจำนวนมาก ผู้อ่านไม่มีเวลาไล่อ่านทั้งหมดแต่ต้องการรู้ประเด็นหลักอย่างรวดเร็ว</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ต่อยอดไปสู่ระบบอะไรได้บ้าง</h3>
+            <ul class="ext-list">
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Browser Extension สรุปข่าว</strong> — สรุปบทความให้อัตโนมัติขณะเปิดอ่าน</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ระบบสรุปเอกสารในองค์กร</strong> — สรุปรายงานประชุมหรือเอกสารราชการภาษาไทยที่ยาว</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ฟีเจอร์ในแอปข่าวหรือ RSS Reader</strong> — แสดงสรุปก่อนให้ผู้ใช้เลือกอ่านฉบับเต็ม</div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">เอกสารอ้างอิงและตัวอย่างที่มีอยู่แล้ว</h3>
+            <div class="ref-list">
+              <a class="ref-card" href="https://github.com/nakhunchumpolsathien/ThaiSum" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">ThaiSum Dataset <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/nakhunchumpolsathien</span>
+                </div>
+                <p class="ref-desc">ข่าวไทยกว่า 350,000 บทความจาก Thairath, ThaiPBS, Prachathai และ The Standard พร้อมโมเดล baseline</p>
+              </a>
+              <a class="ref-card" href="https://ph01.tci-thaijo.org/index.php/lej/article/view/256626" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">Fast Hybrid Approach for Thai News Summarization <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">Engineering and Technology Horizons (TCI), 2024</span>
+                </div>
+                <p class="ref-desc">วิธี hybrid TextRank + mBART ที่ทีมสามารถใช้เป็นต้นแบบวิธีวัดผลได้โดยตรง</p>
+              </a>
+              <a class="ref-card" href="https://arxiv.org/pdf/2412.01624" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">Headline-Guided Extractive Summarization for Thai News Articles <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">arXiv, 2024</span>
+                </div>
+                <p class="ref-desc">เปรียบเทียบ Lead-N, BERTSUM และวิธีใช้พาดหัวข่าวช่วยคัดประโยคสำคัญ พร้อมตาราง ROUGE/BLEU ให้เทียบ</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="prev-next-nav">
+            <a class="prev-next-btn prev" href="#p2">
+              <span class="prev-next-label">ก่อนหน้า</span>
+              <span class="prev-next-title">← ตรวจข่าวปลอม</span>
+            </a>
+            <a class="prev-next-btn next" href="#p4">
+              <span class="prev-next-label">ต่อไป</span>
+              <span class="prev-next-title">ตรวจคำผิด/ไวยากรณ์ →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROJECT 4 ============ -->
+      <section id="p4">
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-eng-badge">Spelling &amp; Grammar Correction</span>
+            <h2 class="project-title">4. ตรวจคำผิดและไวยากรณ์ภาษาไทย</h2>
+            <div class="chip-row">
+              <span class="chip">Sequence Labeling / Seq2Seq</span>
+              <span class="chip chip-difficulty">ความยาก: ปานกลาง</span>
+              <span class="chip">สัปดาห์ 6–7 (seq2seq / Transformer)</span>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">คืออะไร</h3>
+            <p class="block-desc">ระบบตรวจและแก้คำผิดหรือไวยากรณ์ภาษาไทย โดยต่อยอดจาก baseline ที่ใช้ Conditional Random Field (CRF) ของ PyThaiNLP ไปเป็นโมเดล neural หรือ Transformer ตามแนวทางงานวิจัยที่ตีพิมพ์แล้ว</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">อินพุตและเอาต์พุต</h3>
+            <div class="io-grid">
+              <div class="io-box input">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Input</span>
+                  <span class="io-box-title">อินพุต</span>
+                </div>
+                <p>ข้อความภาษาไทยที่อาจมีคำสะกดผิดหรือไวยากรณ์ไม่ถูกต้อง</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Output</span>
+                  <span class="io-box-title">เอาต์พุต</span>
+                </div>
+                <p>ข้อความที่แก้ไขแล้ว พร้อม highlight ตำแหน่งที่แก้และคำแนะนำทางเลือก</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ปัญหาที่แก้ไข</h3>
+            <p class="block-desc">การพิมพ์ผิดหรือสะกดผิดพบบ่อยในแชท อีเมลธุรกิจ และเอกสารราชการ ทำให้สื่อสารดูไม่เป็นมืออาชีพหรือเข้าใจผิดพลาด</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ต่อยอดไปสู่ระบบอะไรได้บ้าง</h3>
+            <ul class="ext-list">
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ปลั๊กอินสำหรับ Word / Google Docs</strong> — ตรวจคำผิดภาษาไทยขณะพิมพ์เอกสาร</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Auto-correct บนคีย์บอร์ดมือถือ</strong> — แก้คำผิดแบบเรียลไทม์ขณะพิมพ์แชท</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ระบบ QA เอกสารราชการ</strong> — ตรวจสอบความถูกต้องก่อนเผยแพร่เอกสารทางการ</div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">เอกสารอ้างอิงและตัวอย่างที่มีอยู่แล้ว</h3>
+            <div class="ref-list">
+              <a class="ref-card" href="https://github.com/PyThaiNLP/spelling-check" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">PyThaiNLP — thaispellcheck (CRF) <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/PyThaiNLP</span>
+                </div>
+                <p class="ref-desc">แพ็กเกจตรวจคำผิดภาษาไทยที่ deploy จริงผ่าน pip ใช้เป็น baseline ตั้งต้นได้ทันที</p>
+              </a>
+              <a class="ref-card" href="https://ieeexplore.ieee.org/document/9145483" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">Thai Spelling Correction and Word Normalization on Social Text <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">IEEE, 2020</span>
+                </div>
+                <p class="ref-desc">เสนอ two-stage pipeline ด้วย neural contextual attention สำหรับข้อความโซเชียลไทย</p>
+              </a>
+              <a class="ref-card" href="https://github.com/ponlawat-w/thai-spelling-fix" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">thai-spelling-fix <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/ponlawat-w</span>
+                </div>
+                <p class="ref-desc">ตรวจจับและแก้การพิมพ์ผิดหลักภาษาไทยด้วย regular expression — ตัวอย่างแนวทาง rule-based เทียบกับแนว ML</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="prev-next-nav">
+            <a class="prev-next-btn prev" href="#p3">
+              <span class="prev-next-label">ก่อนหน้า</span>
+              <span class="prev-next-title">← สรุปข่าวอัตโนมัติ</span>
+            </a>
+            <a class="prev-next-btn next" href="#p5">
+              <span class="prev-next-label">ต่อไป</span>
+              <span class="prev-next-title">แชทบอทตอบคำถามเอกสาร →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROJECT 5 ============ -->
+      <section id="p5">
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-eng-badge">RAG Chatbot / Document QA</span>
+            <h2 class="project-title">5. แชทบอทตอบคำถามจากเอกสาร</h2>
+            <div class="chip-row">
+              <span class="chip">Retrieval-Augmented Generation</span>
+              <span class="chip chip-difficulty">ความยาก: ปานกลาง</span>
+              <span class="chip">สัปดาห์ 8–10 (LLM / Multimodal)</span>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">คืออะไร</h3>
+            <p class="block-desc">แชทบอทตอบคำถามจากเอกสารภาษาไทยด้วยเทคนิค Retrieval-Augmented Generation (RAG) ระบบจะค้นข้อมูลที่เกี่ยวข้องจาก vector database ก่อน แล้วส่งให้ Thai LLM สร้างคำตอบโดยอ้างอิงเนื้อหาจากเอกสารจริง ไม่ใช่ตอบจากความจำของโมเดลล้วน ๆ</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">อินพุตและเอาต์พุต</h3>
+            <div class="io-grid">
+              <div class="io-box input">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Input</span>
+                  <span class="io-box-title">อินพุต</span>
+                </div>
+                <p>คำถามภาษาไทย ร่วมกับคลังเอกสาร (PDF คู่มือ ระเบียบ หรือสรุปวิชา) ที่อัปโหลดไว้ล่วงหน้า</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Output</span>
+                  <span class="io-box-title">เอาต์พุต</span>
+                </div>
+                <p>คำตอบภาษาไทยพร้อมอ้างอิงตำแหน่งในเอกสารต้นทางที่ใช้ตอบ</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ปัญหาที่แก้ไข</h3>
+            <p class="block-desc">ผู้ใช้ต้องเสียเวลาไล่หาข้อมูลในเอกสารยาว ๆ ทุกครั้งที่มีคำถาม เช่น คู่มือการใช้งาน ระเบียบข้อบังคับ หรือสรุปเนื้อหาวิชา</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ต่อยอดไปสู่ระบบอะไรได้บ้าง</h3>
+            <ul class="ext-list">
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Internal Knowledge Assistant</strong> — ผู้ช่วยตอบคำถาม HR หรือ IT Helpdesk ภายในองค์กร</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Chatbot ตอบคำถามนักเรียน/นักศึกษา</strong> — จากเอกสารการเรียนหรือคู่มือของมหาวิทยาลัย</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ระบบให้คำปรึกษาเบื้องต้น</strong> — ตอบคำถามจากเอกสารกฎหมายหรือสัญญาจริงขององค์กร</div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">เอกสารอ้างอิงและตัวอย่างที่มีอยู่แล้ว</h3>
+            <div class="ref-list">
+              <a class="ref-card" href="https://github.com/OpenThaiGPT" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">OpenThaiGPT <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/OpenThaiGPT</span>
+                </div>
+                <p class="ref-desc">Thai-centric open source LLM พร้อม Thai-native RAG framework ให้ใช้เป็นฐานได้ทันที</p>
+              </a>
+              <a class="ref-card" href="https://github.com/encX/rag-workshop" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">RAG Workshop (TechSauce Global Summit) <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/encX</span>
+                </div>
+                <p class="ref-desc">ตัวอย่าง workshop สอนสร้าง RAG chatbot ตั้งแต่พื้นฐาน embedding จนถึงระบบค้นหา</p>
+              </a>
+              <a class="ref-card" href="https://github.com/vistec-AI/thai2transformers" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">thai2transformers (WangchanBERTa) <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/vistec-AI</span>
+                </div>
+                <p class="ref-desc">โมเดลภาษาไทยจาก VISTEC-depa ที่ใช้เป็นส่วนประกอบ embedding หรือ reranker ในระบบ RAG ได้</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="prev-next-nav">
+            <a class="prev-next-btn prev" href="#p4">
+              <span class="prev-next-label">ก่อนหน้า</span>
+              <span class="prev-next-title">← ตรวจคำผิด/ไวยากรณ์</span>
+            </a>
+            <a class="prev-next-btn next" href="#p6">
+              <span class="prev-next-label">ต่อไป</span>
+              <span class="prev-next-title">ตัดคำ/NER เฉพาะโดเมน →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROJECT 6 ============ -->
+      <section id="p6">
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-eng-badge">Domain-specific Word Segmentation / NER</span>
+            <h2 class="project-title">6. ตัดคำและหา Entity เฉพาะโดเมน</h2>
+            <div class="chip-row">
+              <span class="chip">Word Segmentation / Sequence Labeling</span>
+              <span class="chip chip-difficulty">ความยาก: ปานกลาง–สูง</span>
+              <span class="chip">สัปดาห์ 2 (word segmentation / POS)</span>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">คืออะไร</h3>
+            <p class="block-desc">โมเดลตัดคำและหา named entity ภาษาไทยที่ปรับให้เหมาะกับโดเมนเฉพาะทาง เช่น การแพทย์หรือกฎหมาย โดยเทียบผลกับ baseline ทั่วไปที่มีอยู่แล้ว เช่น DeepCut และ SynThai ซึ่งวัด F-measure ไว้ชัดเจน</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">อินพุตและเอาต์พุต</h3>
+            <div class="io-grid">
+              <div class="io-box input">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Input</span>
+                  <span class="io-box-title">อินพุต</span>
+                </div>
+                <p>ข้อความภาษาไทยในโดเมนเฉพาะ เช่น ใบสั่งยา หรือข้อสัญญา</p>
+              </div>
+              <div class="io-box output">
+                <div class="io-box-header">
+                  <span class="io-box-tag">Output</span>
+                  <span class="io-box-title">เอาต์พุต</span>
+                </div>
+                <p>ข้อความที่ตัดคำแล้ว พร้อม tag entity ที่พบ เช่น ชื่อยา มาตรากฎหมาย หรือชื่อบุคคล</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ปัญหาที่แก้ไข</h3>
+            <p class="block-desc">โมเดลตัดคำทั่วไปมักพลาดคำศัพท์เฉพาะทางที่ไม่อยู่ในคลังคำปกติ ทำให้ระบบปลายทางอย่างการค้นหาหรือแชทบอททำงานผิดพลาด</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">ต่อยอดไปสู่ระบบอะไรได้บ้าง</h3>
+            <ul class="ext-list">
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ระบบค้นหาเอกสารเฉพาะทาง</strong> — ค้นหาเอกสารการแพทย์หรือกฎหมายได้แม่นยำขึ้น</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>Document Automation</strong> — สกัดข้อมูลจากใบสั่งยาหรือสัญญาแบบอัตโนมัติ</div>
+              </li>
+              <li class="ext-item">
+                <span class="ext-bullet"></span>
+                <div><strong>ฐานข้อมูล Entity สำหรับ Chatbot เฉพาะทาง</strong> — ใช้เป็นชั้นเข้าใจภาษาให้แชทบอทในโดเมนนั้น</div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">เอกสารอ้างอิงและตัวอย่างที่มีอยู่แล้ว</h3>
+            <div class="ref-list">
+              <a class="ref-card" href="https://github.com/rkcosmos/deepcut" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">DeepCut <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/rkcosmos</span>
+                </div>
+                <p class="ref-desc">ตัวตัดคำไทยด้วย CNN ได้ F-measure ราว 98.8% ใช้เป็น baseline เทียบผลได้ทันที</p>
+              </a>
+              <a class="ref-card" href="https://github.com/KrakenAI/SynThai" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">SynThai <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/KrakenAI</span>
+                </div>
+                <p class="ref-desc">ตัดคำและ POS tagging ด้วย RNN/LSTM ได้ F-measure ราว 99.2%</p>
+              </a>
+              <a class="ref-card" href="https://github.com/keyreply/Thai-NLP-Dataset" target="_blank" rel="noopener">
+                <div class="ref-card-header">
+                  <span class="ref-title">Thai NLP Dataset (รวมลิงก์เครื่องมือ) <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>
+                  <span class="ref-meta">github.com/keyreply</span>
+                </div>
+                <p class="ref-desc">รวมรายชื่อเครื่องมือตัดคำ, POS tagging และ NER ภาษาไทยพร้อมค่า F-measure ของแต่ละตัวไว้เทียบกัน</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="prev-next-nav">
+            <a class="prev-next-btn prev" href="#p5">
+              <span class="prev-next-label">ก่อนหน้า</span>
+              <span class="prev-next-title">← แชทบอทตอบคำถามเอกสาร</span>
+            </a>
+            <a class="prev-next-btn next" href="#rubric">
+              <span class="prev-next-label">กลับไปที่</span>
+              <span class="prev-next-title">เกณฑ์คะแนน (40%) ↑</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Floating Action Buttons -->
+<div class="floating-actions">
+  <button class="floating-btn" id="scrollTopBtn" title="กลับไปบนสุด" aria-label="กลับไปบนสุด">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+  </button>
+</div>
+
+<script>
+(function(){
+  // Elements
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+  var sections = links.map(function(l){ return document.getElementById(l.dataset.target); }).filter(Boolean);
+  var scrollTopBtn = document.getElementById('scrollTopBtn');
+  var menuToggle = document.getElementById('menuToggle');
+  var sidebar = document.getElementById('sidebar');
+  var sidebarBackdrop = document.getElementById('sidebarBackdrop');
+  var themeToggle = document.getElementById('themeToggle');
+  var mobileThemeToggle = document.getElementById('mobileThemeToggle');
+  var themeLabel = document.getElementById('themeLabel');
+  var topicSearch = document.getElementById('topicSearch');
+
+  // Theme Handling (Pure attribute toggle, never style per element)
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('nlp_doc_theme', theme);
+    if (themeLabel) {
+      themeLabel.textContent = (theme === 'dark') ? 'ธีมมืด' : 'ธีมสว่าง';
+    }
+  }
+
+  // Update label on initial load
+  var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  if (themeLabel) {
+    themeLabel.textContent = (currentTheme === 'dark') ? 'ธีมมืด' : 'ธีมสว่าง';
+  }
+
+  function toggleTheme() {
+    var nowTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(nowTheme === 'dark' ? 'light' : 'dark');
+  }
+
+  if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+  if (mobileThemeToggle) mobileThemeToggle.addEventListener('click', toggleTheme);
+
+  // Active Link State
+  function setActive(id){
+    links.forEach(function(l){
+      l.classList.toggle('active', l.dataset.target === id);
+    });
+  }
+
+  // ScrollSpy
+  var currentSectionId = 'rubric';
+  function updateScrollSpy() {
+    var scrollPosition = window.scrollY + 140;
+    var docHeight = document.documentElement.scrollHeight;
+    var winHeight = window.innerHeight;
+
+    // Last section trigger on reaching bottom
+    if (window.scrollY + winHeight >= docHeight - 50) {
+      if (sections.length > 0) {
+        var lastId = sections[sections.length - 1].id;
+        setActive(lastId);
+        return;
+      }
+    }
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      var s = sections[i];
+      if (s.offsetTop <= scrollPosition) {
+        if (currentSectionId !== s.id) {
+          currentSectionId = s.id;
+          setActive(s.id);
+        }
+        break;
+      }
+    }
+  }
+
+  window.addEventListener('scroll', function(){
+    updateScrollSpy();
+
+    if (window.scrollY > 300) {
+      scrollTopBtn.classList.add('visible');
+    } else {
+      scrollTopBtn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  if (scrollTopBtn) {
+    scrollTopBtn.addEventListener('click', function(){
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Mobile Drawer Navigation
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    sidebarBackdrop.classList.remove('open');
+  }
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    sidebarBackdrop.classList.add('open');
+  }
+
+  if (menuToggle) {
+    menuToggle.addEventListener('click', function(){
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
+
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', closeSidebar);
+  }
+
+  links.forEach(function(l){
+    l.addEventListener('click', function(){
+      if (window.innerWidth <= 860) {
+        closeSidebar();
+      }
+    });
+  });
+
+  // Search Filter
+  if (topicSearch) {
+    var allNavItems = Array.prototype.slice.call(document.querySelectorAll('.sidebar-nav li'));
+    topicSearch.addEventListener('input', function(e){
+      var q = (e.target.value || '').toLowerCase().trim();
+      allNavItems.forEach(function(item){
+        var text = item.textContent.toLowerCase();
+        item.style.display = (!q || text.indexOf(q) !== -1) ? '' : 'none';
+      });
+    });
+  }
+
+  // Initial call
+  updateScrollSpy();
+})();
+</script>
+</body>
+</html>
