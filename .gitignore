@@ -3,3 +3,6 @@ Thumbs.db
 *.tmp
 .idea/
 .vscode/
+
+# Ignore course study PDF files
+*.pdf
